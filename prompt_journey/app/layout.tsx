@@ -1,21 +1,25 @@
 import { RootLayoutProps } from '@/models/RootLayout.model';
+import Nav from '@components/Nav';
 import '@styles/global.css';
 import { FC } from 'react';
 
 export const metadata = {
-  title: 'PromptJourney',
+  title: 'Prompt Journey',
   dezcription: 'Share & Discover MidJourney Prompts',
 };
 
 const RootLayout: FC<RootLayoutProps> = ({ children }) => {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body>
-        <div className='main'>
-          <div className='gradient' />
+        <div className="main">
+          <div className="gradient" />
         </div>
 
-        <main className='app'>{children}</main>
+        <main className="app">
+          <Nav />
+          {children}
+        </main>
       </body>
     </html>
   );
