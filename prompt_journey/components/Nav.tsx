@@ -2,15 +2,38 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { signIn, signOut, useSession, getProviders } from 'next-auth/react';
+import { signIn, signOut, getProviders, ClientSafeProvider, LiteralUnion } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { BuiltInProviderType } from 'next-auth/providers';
 
 const Nav = () => {
   const isUserLoggedIn = true;
+  const [stateProviders, setStateProviders] = useState<Record<
+    LiteralUnion<BuiltInProviderType, string>,
+    ClientSafeProvider
+  > | null>(null);
+
+  const [togleDropDown, setTogleDropDown] = useState(false);
+
+  useEffect(() => {
+    const setProviders = async () => {
+      const response = await getProviders();
+      setStateProviders(response);
+    };
+
+    setProviders();
+  }, []);
 
   return (
-    <nav className="flex flex-between w-full mb-16 pt-3">
+    <div className="flex flex-between w-full mb-16 pt-3">
       <Link href="/" className="flex gap-2 flex-center">
-        <Image src="assets/images/logo.svg" alt="logo" width={30} height={30} className="object-contain" />
+        <Image
+          src="assets/images/logo.svg"
+          alt="logo"
+          width={30}
+          height={30}
+          className="object-contain"
+        />
         <span className="logo-text">Prompt Journey</span>
       </Link>
 
@@ -20,16 +43,93 @@ const Nav = () => {
             <Link href="/create-prompt" className="black_btn">
               Create Post
             </Link>
-            <button>Sign Out</button>
+            <button type="button" onClick={() => signOut()} className="outline_btn">
+              Sign Out
+            </button>
             <Link href="/profile">
-              <Image src="/assets/images/profile.svg" alt="profile" width={37} height={37} className="rounded-full" />
+              <Image
+                src="/assets/images/profile.svg"
+                alt="profile"
+                width={37}
+                height={37}
+                className="rounded-full"
+              />
             </Link>
           </div>
         ) : (
-          <div>blabla</div>
+          <>
+            {stateProviders &&
+              Object.values(stateProviders).map((provider) => (
+                <button
+                  type="button"
+                  key={provider.name}
+                  onClick={() => signIn(provider.id)}
+                  className="black_btn"
+                >
+                  Sign In
+                </button>
+              ))}
+          </>
         )}
       </div>
-    </nav>
+
+      <div className="sm:hidden flex relative">
+        {isUserLoggedIn ? (
+          <div className="flex">
+            <Image
+              src="/assets/images/profile.svg"
+              alt="profile"
+              width={37}
+              height={37}
+              className="rounded-full"
+              onClick={() => setTogleDropDown((previousState) => !previousState)}
+            />
+            {togleDropDown && (
+              <div className="dropdown">
+                <Link
+                  href="/profile"
+                  className="dropdown_link"
+                  onClick={() => setTogleDropDown(false)}
+                >
+                  My Profile
+                </Link>{' '}
+                <Link
+                  href="/create-prompt"
+                  className="dropdown_link"
+                  onClick={() => setTogleDropDown(false)}
+                >
+                  Create Prompt
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTogleDropDown(false);
+                    signOut();
+                  }}
+                  className="mt-5 w-full black_btn"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <>
+            {stateProviders &&
+              Object.values(stateProviders).map((provider) => (
+                <button
+                  type="button"
+                  key={provider.name}
+                  onClick={() => signIn(provider.id)}
+                  className="black_btn"
+                >
+                  Sign Ingg
+                </button>
+              ))}
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
