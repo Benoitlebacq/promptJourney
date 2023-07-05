@@ -1,5 +1,6 @@
 import { RootLayoutProps } from '@/models/RootLayout.model';
 import Nav from '@components/Nav';
+import Provider from '@components/Provider';
 import '@styles/global.css';
 import { FC } from 'react';
 
@@ -17,7 +18,9 @@ const RootLayout: FC<RootLayoutProps> = ({ children }) => {
         </div>
 
         <main className="app">
-          <Nav />
+          <Provider>
+            <Nav />
+          </Provider>
           {children}
         </main>
       </body>

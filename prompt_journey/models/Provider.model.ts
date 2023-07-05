@@ -3,5 +3,5 @@ import { ReactNode } from 'react';
 
 export type ProviderProps = {
   children: ReactNode;
-  session: Session;
+  session: Session | null | undefined;
 };

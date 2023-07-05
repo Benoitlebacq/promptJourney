@@ -2,18 +2,26 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { signIn, signOut, getProviders, ClientSafeProvider, LiteralUnion } from 'next-auth/react';
+import {
+  signIn,
+  signOut,
+  getProviders,
+  ClientSafeProvider,
+  LiteralUnion,
+  useSession,
+} from 'next-auth/react';
 import { useEffect, useState } from 'react';
 import { BuiltInProviderType } from 'next-auth/providers';
 
 const Nav = () => {
-  const isUserLoggedIn = true;
+  const { data: session } = useSession();
+
   const [stateProviders, setStateProviders] = useState<Record<
     LiteralUnion<BuiltInProviderType, string>,
     ClientSafeProvider
   > | null>(null);
 
-  const [togleDropDown, setTogleDropDown] = useState(false);
+  const [toggleDropDown, setToggleDropDown] = useState(false);
 
   useEffect(() => {
     const setProviders = async () => {
@@ -38,7 +46,7 @@ const Nav = () => {
       </Link>
 
       <div className="sm:flex hidden">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex gap-3 md:gap-5">
             <Link href="/create-prompt" className="black_btn">
               Create Post
@@ -74,7 +82,7 @@ const Nav = () => {
       </div>
 
       <div className="sm:hidden flex relative">
-        {isUserLoggedIn ? (
+        {session?.user ? (
           <div className="flex">
             <Image
               src="/assets/images/profile.svg"
@@ -82,28 +90,28 @@ const Nav = () => {
               width={37}
               height={37}
               className="rounded-full"
-              onClick={() => setTogleDropDown((previousState) => !previousState)}
+              onClick={() => setToggleDropDown((previousState) => !previousState)}
             />
-            {togleDropDown && (
+            {toggleDropDown && (
               <div className="dropdown">
                 <Link
                   href="/profile"
                   className="dropdown_link"
-                  onClick={() => setTogleDropDown(false)}
+                  onClick={() => setToggleDropDown(false)}
                 >
                   My Profile
                 </Link>{' '}
                 <Link
                   href="/create-prompt"
                   className="dropdown_link"
-                  onClick={() => setTogleDropDown(false)}
+                  onClick={() => setToggleDropDown(false)}
                 >
                   Create Prompt
                 </Link>
                 <button
                   type="button"
                   onClick={() => {
-                    setTogleDropDown(false);
+                    setToggleDropDown(false);
                     signOut();
                   }}
                   className="mt-5 w-full black_btn"
